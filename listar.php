@@ -25,49 +25,74 @@
 <body>
     <nav>
         <div class="nav-wrapper blue darken-4">
-            <a href="https://fesarweb2.000webhostapp.com" class="brand-logo">FES Aragón</a>
+            <a href="index.html" class="brand-logo">PowerTicket</a>
         </div>
     </nav>
     <?php
-    $server = "";
-    $usuario = "";
-    $contra = "";
-    $bd = "";
+include_once 'credenciales.php';
 
-    $conn = new mysqli($server, $usuario, $contra, $bd);
+//Toma como parametros las credenciales de la base de datos y regresa la conexión concretada
+function getConexion($server, $usuario, $contra, $bd) {
+    return new mysqli($server, $usuario, $contra, $bd);
+}
 
-    $sql = "SELECT * FROM alumnos";
-    $result = $conn->query($sql);
+//Hace una query a la base de datos que llama a todas las entradas de tickets
+function consutarTickets($conn) {
+    $sql = "SELECT * FROM tickets";
+    return $conn->query($sql);
+}
 
-    if ($result->num_rows > 0) {
-        echo '
-        <form class="col s8 offset-s2" action="eliminar.php" method="post">
+//Función vacía que muestra formulario
+function formulario() {
+    echo '
+    <form class="col s8 offset-s2" action="eliminar.php" method="post">
         <div class="form-field col s12">
-        <label for="numeroCuenta">Número de cuenta</label>
-        <input placeholder="Número de cuenta" name="numeroCuenta" type="text" class="validate" required>
-    </div>
-    <button type="submit" class="offset-s3 waves-effect waves-light btn amber darken-1 col s6">Enviar</button>
+            <label for="ticket">Ticket</label>
+            <input placeholder="Ticket" name="ticket" type="text" class="validate" required>
+        </div>
+        <button type="submit" class="offset-s3 waves-effect waves-light btn amber darken-1 col s6">Eliminar ticket</button>
     </form>';
-        echo "<table>";
-        echo "<tr><th>Número de Cuenta</th><th>Nombre Completo</th><th>E-mail</th><th>Carrera</th><th>Fecha de Registro</th></tr>";
-        
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>";
-            echo "<td>" . $row['numeroCuenta'] . "</td>";
-            echo "<td>" . $row['nombre'] . "</td>";
-            echo "<td>" . $row['email'] . "</td>";
-            echo "<td>" . $row['carrera'] . "</td>";
-            echo "<td>" . $row['fechaRegistro'] . "</td>";
-            echo "</tr>";
-        }
-        
-        echo "</table>";
-    } else {
-        echo "No hay alumnos aún.";
-    }
+}
 
-    $conn->close();
-    ?>
+//Función vacía que muestra cabecera de tabla
+function cabeceraTabla() {
+    echo "<table>";
+    echo "<tr><th>Ticket</th><th>Titulo</th><th>Contenido</th><th>Fecha de inicio</th><th>Estado</th></tr>";
+}
+
+//Función vacía que muestra fila de tabla
+function filaTabla($row) {
+    echo "<tr>";
+    echo "<td>" . $row['ticket'] . "</td>";
+    echo "<td>" . $row['titulo'] . "</td>";
+    echo "<td>" . $row['contenido'] . "</td>";
+    echo "<td>" . $row['fechaRegistro'] . "</td>";
+    echo "<td>" . $row['estado'] . "</td>";
+    echo "</tr>";
+}
+
+//A partir del resultado de la query se muestran los tickets en filas
+function mostrarTickets($result) {
+    cabeceraTabla();
+    while ($row = $result->fetch_assoc()) {
+        filaTabla($row);
+    }
+    echo "</table>";
+}
+
+$conn = getConexion($server, $usuario, $contra, $bd);
+$result = consultarTickets($conn);
+
+if ($result->num_rows > 0) {
+    formulario();
+    mostrarTickets($result);
+} else {
+    echo "No hay tickets aún.";
+}
+
+$conn->close();
+?>
+
     <script type="text/javascript" src="js/materialize.min.js"></script>
 </body>
 </html>

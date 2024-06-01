@@ -1,33 +1,44 @@
 <?php
-$server = "localhost";
-$usuario = "";
-$contra = "";
-$bd = "";
+include_once 'credenciales.php';
 
-$conn = new mysqli($server, $usuario, $contra, $bd);
-
-if ($conn->connect_error) {
-    die("Fallo: " . $conn->connect_error);
+//Inicia una conexión a partir de las credenciales y regresa una conexión
+function getConexion($server, $usuario, $contra, $bd) {
+    $conn = new mysqli($server, $usuario, $contra, $bd);
+    if ($conn->connect_error) {
+        die("Fallo: " . $conn->connect_error);
+    }
+    return $conn;
 }
 
-$email = $_POST['email'];
-$numeroCuenta = $_POST['numeroCuenta'];
-
-$url = "https://fesarweb2.000webhostapp.com/listar.php";
-$urlError = "https://fesarweb2.000webhostapp.com/error.html";
-
-$stmt = $conn->prepare("SELECT * FROM alumnos WHERE email = ? AND numeroCuenta = ?");
-$stmt->bind_param("ss", $email, $numeroCuenta);
-$stmt->execute();
-
-$result = $stmt->get_result();
-
-if ($result->num_rows == 1) {
-    header("Location: " . $url);
-} else {
-    header("Location: " . $urlError);
+//Inicia sesión si las credenciales proporcionadas por el usuario son correctas
+function autenticacion($conn, $numUsuario, $licencia) {
+    $stmt = $conn->prepare("SELECT * FROM usuarios WHERE numUsuario = ? AND licencia = ?");
+    $stmt->bind_param("ss", $numUsuario, $licencia);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $stmt->close();
+    return $resultado;
 }
 
-$stmt->close();
+//Con el estado de resultado redirige a una URL de error o una de éxito
+function redireccion($resultado, $correcta, $errorUrl) {
+    if ($resultado->num_rows == 1) {
+        header("Location: " . $correcta);
+    } else {
+        header("Location: " . $errorUrl);
+    }
+    exit();
+}
+
+$numUsuario = $_POST['numUsuario'];
+$licencia = $_POST['licencia'];
+$url = "listar.php";
+$urlError = "error.html";
+
+$conn = getConexion($server, $usuario, $contra, $bd);
+$resultado = autenticacion($conn, $numUsuario, $licencia);
+redireccion($resultadoado, $url, $urlError);
+
 $conn->close();
 ?>
+

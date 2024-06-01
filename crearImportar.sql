@@ -14,5 +14,6 @@ CREATE TABLE tickets (
   titulo VARCHAR(100),
   fechaRegistro DATE,
   contenido VARCHAR(50),
-  estado INT(3)
+  estado INT(3),
+  FOREIGN KEY (licencia) references usuarios(licencia)
 );

@@ -2,10 +2,17 @@ CREATE DATABASE db;
 
 USE db;
 
-CREATE TABLE alumnos (
-  numeroCuenta INT PRIMARY KEY,
+CREATE TABLE usuarios (
+  numUsuario INT PRIMARY KEY,
   nombre VARCHAR(100),
   fechaRegistro DATE,
-  carrera VARCHAR(50),
-  email VARCHAR(55)
+  licencia VARCHAR(50),
+  area VARCHAR(55)
+);
+CREATE TABLE tickets (
+  ticket INT PRIMARY KEY,
+  titulo VARCHAR(100),
+  fechaRegistro DATE,
+  contenido VARCHAR(50),
+  estado INT(3)
 );
